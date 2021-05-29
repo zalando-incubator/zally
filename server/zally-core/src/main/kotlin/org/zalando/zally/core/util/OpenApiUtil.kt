@@ -1,6 +1,8 @@
 package org.zalando.zally.core.util
 
 import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.Operation
+import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.Parameter
 import io.swagger.v3.oas.models.responses.ApiResponse
@@ -162,3 +164,6 @@ fun Schema<Any>.extensibleEnum(): List<String> =
     if (this.isExtensibleEnum()) {
         (this.extensions["x-extensible-enum"] as List<*>).map { it.toString() }
     } else emptyList()
+
+fun PathItem.allOperations(): List<Operation> =
+    listOf(this.head, this.get, this.post, this.delete, this.put, this.trace, this.options, this.patch)
