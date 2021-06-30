@@ -1,24 +1,28 @@
 package org.zalando.zally.apireview
 
-import org.zalando.zally.dto.ApiDefinitionRequest
-import org.zalando.zally.core.Result
-import org.zalando.zally.rule.api.Severity
 import org.hibernate.annotations.Parameter
 import org.hibernate.annotations.Type
+import org.zalando.zally.core.Result
+import org.zalando.zally.dto.ApiDefinitionRequest
+import org.zalando.zally.rule.api.Severity
 import java.io.Serializable
 import java.time.Instant
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
-import javax.persistence.CascadeType
-import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.Column
+import javax.persistence.ElementCollection
+import javax.persistence.CollectionTable
+import javax.persistence.FetchType
+import javax.persistence.JoinColumn
+import javax.persistence.MapKeyColumn
 import javax.persistence.OneToMany
+import javax.persistence.CascadeType
 
 @Suppress("unused")
 @Entity
@@ -46,6 +50,15 @@ class ApiReview(
 
     @Column(nullable = false)
     val jsonPayload: String = request.toString()
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "custom_label_mapping",
+        joinColumns = [JoinColumn(name = "api_review_id", referencedColumnName = "id")]
+    )
+    @MapKeyColumn(name = "label_name")
+    @Column(name = "label_value", nullable = false)
+    val customLabels: Map<String, String> = request.customLabels
 
     @Column(nullable = false, name = "successfulProcessed")
     val isSuccessfulProcessed: Boolean = apiDefinition.isNotBlank()

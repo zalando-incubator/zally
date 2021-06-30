@@ -43,6 +43,7 @@ dependencies {
     compile("org.zalando.stups:stups-spring-oauth2-server:1.0.22")
     compile("org.zalando:problem-spring-web:0.23.0")
     compile("org.zalando:twintip-spring-web:1.1.0")
+    compile("io.micrometer:micrometer-registry-prometheus:1.0.6")
 
     testCompile(project(":zally-test"))
     testCompile("net.jadler:jadler-core:$jadlerVersion")

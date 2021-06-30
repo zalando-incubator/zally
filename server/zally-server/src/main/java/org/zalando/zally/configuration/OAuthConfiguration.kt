@@ -50,7 +50,8 @@ class OAuthConfiguration : ResourceServerConfigurerAdapter() {
                 "/metrics/?(\\?.*)?",
                 "/api-violations/?([a-z0-9-]+/?)?(\\?)?",
                 "/supported-rules/?(\\?.*)?",
-                "/review-statistics/?(\\?.*)?"
+                "/review-statistics/?(\\?.*)?",
+                "/prometheus/?(\\?.*)?"
             )
             .access("#oauth2.hasScope('uid')")
             .antMatchers("**").denyAll()

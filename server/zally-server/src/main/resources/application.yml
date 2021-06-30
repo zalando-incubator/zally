@@ -26,7 +26,7 @@ management:
     web:
       base-path: /
       exposure:
-        include: health, metrics
+        include: health, metrics, prometheus
   server:
     port: ${MANAGEMENT_PORT:7979}
 

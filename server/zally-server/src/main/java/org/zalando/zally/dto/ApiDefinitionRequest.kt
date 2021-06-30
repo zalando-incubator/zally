@@ -14,7 +14,9 @@ data class ApiDefinitionRequest(
 
     val apiDefinitionUrl: String? = null,
 
-    val ignoreRules: List<String> = emptyList()
+    val ignoreRules: List<String> = emptyList(),
+
+    val customLabels: Map<String, String> = emptyMap()
 ) {
     /** for java invocations: it doesn't have overloaded constructors */
     companion object Factory {
