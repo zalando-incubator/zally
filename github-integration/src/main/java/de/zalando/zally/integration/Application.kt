@@ -24,7 +24,6 @@ private val BEARER = "Bearer "
 @EnableScheduling
 @EnableJpaRepositories
 @EnableJpaAuditing
-@Import(SchemaResource::class)
 class Application {
 
     @Bean

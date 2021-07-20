@@ -14,7 +14,8 @@ class ReportService(
 ) {
 
     fun getReport(id: Long): Report {
-        val validation = validationRepository.findById(id).orElseThrow({ ValidationNotFoundException("Not found Validation with id $id") })
+        val validation = validationRepository.findById(id)
+            .orElseThrow { ValidationNotFoundException("Not found Validation with id $id") }
         val pullRequest = jsonObjectMapper.readValue(validation.pullRequestInfo, PullRequestEvent::class.java)
 
         return Report(validation.id, pullRequest, validation.apiValidations.map {

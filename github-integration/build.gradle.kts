@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
     repositories {
-        jcenter()
         mavenCentral()
         gradlePluginPortal()
         maven("https://repo.spring.io/libs-release")
@@ -10,7 +9,8 @@ buildscript {
 }
 
 plugins {
-    val kotlinVersion = "1.3.21"
+    val kotlinVersion = "1.4.32"
+    val klintVersion = "9.2.1"
 
     kotlin("jvm").version(kotlinVersion)
     kotlin("plugin.jpa").version(kotlinVersion)
@@ -19,10 +19,9 @@ plugins {
     kotlin("plugin.allopen").version(kotlinVersion)
 
     id("jacoco")
-    id("org.springframework.boot") version "1.5.19.RELEASE"
-    id("io.spring.dependency-management") version "1.0.7.RELEASE"
+    id("org.springframework.boot") version "2.1.15.RELEASE"
     id("com.github.ben-manes.versions") version "0.20.0"
-    id("org.jlleitschuh.gradle.ktlint") version "7.2.1"
+    id("org.jlleitschuh.gradle.ktlint") version klintVersion
 }
 
 allprojects {
@@ -30,23 +29,20 @@ allprojects {
     apply(plugin = "java")
     apply(plugin = "kotlin")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    apply(plugin = "io.spring.dependency-management")
 
     repositories {
-        jcenter()
         mavenCentral()
     }
 
     tasks.withType(KotlinCompile::class.java).all {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
 }
 
 dependencies {
 
-    val hibernateVersion = "5.2.18.Final"
-    val jacksonVersion = "2.9.8"
-
-    implementation("org.kohsuke:github-api:1.86")
+    implementation("org.kohsuke:github-api:1.131")
     implementation("io.swagger:swagger-parser:1.0.28")
     implementation("com.github.java-json-tools:json-schema-validator:2.2.8")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -54,24 +50,21 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-undertow")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.thymeleaf:thymeleaf-spring4")
-    implementation("org.flywaydb:flyway-core:4.1.2")
-    implementation("org.postgresql:postgresql:42.1.1")
-    implementation("org.hibernate:hibernate-core:$hibernateVersion")
-    implementation("org.hibernate:hibernate-entitymanager:$hibernateVersion")
+    implementation("org.thymeleaf:thymeleaf-spring5")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.hibernate:hibernate-core")
+    implementation("org.hibernate:hibernate-entitymanager")
     implementation("org.jadira.usertype:usertype.core:6.0.1.GA")
-    implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:$jacksonVersion")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-parameter-names")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.zalando.stups:stups-spring-oauth2-server:1.0.18")
-    implementation("org.zalando:problem-spring-web:0.19.0")
+    implementation("org.zalando:problem-spring-web:0.23.0")
     implementation("org.zalando:twintip-spring-web:1.1.0")
-    implementation("org.zalando.zmon:zmon-actuator:0.9.7")
-    implementation("io.dropwizard.metrics:metrics-core:3.2.2")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion") {
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin") {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("io.github.openfeign:feign-core:9.5.1")
@@ -92,7 +85,7 @@ dependencies {
     }
     testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.process:2.0.5")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mockito:mockito-core:1.10.19")
+    testImplementation("org.mockito:mockito-core")
     testImplementation("net.jadler:jadler-core:1.3.0")
     testImplementation("net.jadler:jadler-jdk:1.3.0")
     testImplementation("net.jadler:jadler-junit:1.3.0")

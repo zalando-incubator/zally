@@ -18,15 +18,7 @@ spring:
     properties:
       hibernate.dialect: de.zalando.zally.integration.config.JsonPostgresqlDialect
 
-security:
-  basic:
-    enabled: false
-
 management.port: 0
-
-twintip:
-  mapping: /api
-  yaml: "classpath:/api/bark-api.yaml"
 
 tokens:
   accessTokenUri: https://auth.example.com/oauth2/access_token?realm=testing

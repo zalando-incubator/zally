@@ -4,7 +4,7 @@ MAINTAINER "http://zalando.github.io/"
 LABEL MAINTAINER "http://zalando.github.io/"
 
 COPY build/libs/zally-github-integration.jar /
-COPY scm-source.json /scm-source.json
+COPY zally-server/src/main/resources/api/zally-api.yaml /zalando-apis/gh-integration-api.yaml
 
 EXPOSE 8080
 

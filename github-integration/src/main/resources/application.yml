@@ -2,9 +2,9 @@ spring:
   profiles:
     active: production
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:hsqldb:mem:storage;sql.syntax_pgs=true
+    username: sa
+    password:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -13,56 +13,36 @@ spring:
       hibernate.dialect: de.zalando.zally.integration.config.JsonPostgresqlDialect
   oauth2:
     resource:
-      tokenInfoUri: ${TOKEN_INFO_URI}
+      tokenInfoUri: https://auth.example.com/oauth2/tokeninfo
 
-endpoints:
-  enabled: false
-  health:
-    enabled: true
-  metrics:
-    enabled: true
-    sensitive: false
 
-security:
-  basic:
+management:
+  endpoints:
     enabled: false
-
-management.port: ${MANAGEMENT_PORT}
+    health:
+      enabled: true
+    metrics:
+      enabled: true
+      sensitive: false
+  server:
+    port: 7979
 
 tokens:
-  accessTokenUri: ${OAUTH_TOKEN_ACCESS_URI}
-  credentialsDirectory: ${CREDENTIALS_DIR}
+  accessTokenUri: https://auth.example.com/oauth2/access_token?realm=testing
+  credentialsDirectory: /meta/credentials
   startAfterCreation: true
   token-configuration-list:
     - tokenId: zally
       scopes:
         - uid
 
-twintip:
-  mapping: /api
-  yaml: "classpath:/api/bark-api.yaml"
-
 zally:
-  apiUrl: ${ZALLY_URL}
+  apiUrl: http://localhost:9099
 
 github:
-  apiUrl: ${GITHUB_API_URL}
-  oauthToken: ${GITHUB_OAUTH_TOKEN}
-  secret: ${GITHUB_SECRET}
+  apiUrl: http://localhost:8088
+  oauthToken: abcdef1234567890abcdef1234567890
+  secret: abcdef1234567890abcdef1234567890
 
 bark:
-  serverUrl: ${BARK_SERVER_URL}
----
-spring.profiles: local
-TOKEN_INFO_URI: https://auth.example.com/oauth2/tokeninfo
-MANAGEMENT_PORT: 7979
-GITHUB_API_URL: http://localhost:8088
-GITHUB_OAUTH_TOKEN: abcdef1234567890abcdef1234567890
-GITHUB_SECRET: abcdef1234567890abcdef1234567890
-ZALLY_URL: http://localhost:9099
-OAUTH_TOKEN_ACCESS_URI: https://auth.example.com/oauth2/access_token?realm=testing
-CREDENTIALS_DIR: /meta/credentials
-BARK_SERVER_URL: http://localhost:8080
-SPRING_DATASOURCE_URL: jdbc:hsqldb:mem:storage;sql.syntax_pgs=true
-SPRING_DATASOURCE_USERNAME: sa
-SPRING_DATASOURCE_PASSWORD:
+  serverUrl: http://localhost:8080
