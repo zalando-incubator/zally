@@ -1,15 +1,70 @@
-build_steps:
-- desc: "Install Build Dependencies"
-  cmd: |
-    apt-get update -qq --allow-unauthenticated
-    apt-get install --no-install-recommends -y jq
-    curl -fLOsS https://delivery.cloud.zalando.com/utils/ensure-docker && sh ensure-docker
-    docker pull registry.opensource.zalan.do/library/openjdk-11-jdk-slim:latest
-    docker pull node:10
-- desc: "Build and Test"
-  cmd: |
-    docker run --rm -w /build -v $PWD/server:/build:rw registry.opensource.zalan.do/library/openjdk-11-jdk-slim:latest ./gradlew build --info
-    docker run --rm -w /build -v $PWD/web-ui:/build:rw node:10 bash -c 'npm install -q ; npm test ; npm run build'
-    docker run --rm -w /build -v $PWD/github-integration:/build:rw registry.opensource.zalan.do/library/openjdk-11-jdk-slim:latest ./gradlew build -x test --info
-- desc: "Build and Push Docker Images"
-  cmd: bash .delivery/build-and-push.sh
+allow_concurrent_steps: true
+version: "2017-09-20"
+pipeline:
+  - id: build-server
+    type: script
+    overlay: ci/java11
+    commands:
+      - desc: Build server
+        cmd: |
+          cd $PWD/server
+          ./gradlew zally-server:build
+    cache:
+      paths: [ ~/.gradle/caches, ~/.gradle/wrapper ]
+
+  - id: github-integration
+    type: script
+    overlay: ci/java11
+    commands:
+      - desc: Build Github Integration
+        cmd: |
+          cd $PWD/github-integration
+          ./gradlew build -x test --info
+    cache:
+      paths: [ ~/.gradle/caches, ~/.gradle/wrapper ]
+
+  - id: web-ui
+    type: script
+    overlay: ci/nodejs-10
+    commands:
+      - desc: Build Web UI
+        cmd: |
+          cd $PWD/web-ui
+          npm install -q ; npm test ; npm run build
+    cache:
+      paths: [ ~/.npm ]
+
+  - id: build-and-push-images
+    type: script
+    env:
+      DOCKER_HOST: "pierone.stups.zalan.do"
+      DOCKER_TEAM: "pitchfork"
+    when:
+      branch: master
+    depends_on: [ all_of_the_above ]
+    commands:
+      - desc: Check dependencies
+        cmd: |
+          curl -fLOsS https://delivery.cloud.zalando.com/utils/ensure-docker && sh ensure-docker
+
+      - desc: Building and pushing Zally Server
+        cmd: |
+          DOCKER_VERSION="${CDP_TARGET_BRANCH}-${CDP_TARGET_COMMIT_ID:0:8}-${CDP_TARGET_REPOSITORY_COUNTER}"
+          cd server
+          docker build -t "${DOCKER_HOST}/${DOCKER_TEAM}/zally:${DOCKER_VERSION}" .
+          docker push "${DOCKER_HOST}/${DOCKER_TEAM}/zally:${DOCKER_VERSION}"
+
+      - desc: Building and pushing Zally Web UI Dummy
+        cmd: |
+          DOCKER_VERSION="${CDP_TARGET_BRANCH}-${CDP_TARGET_COMMIT_ID:0:8}-${CDP_TARGET_REPOSITORY_COUNTER}"
+          cd web-ui
+          docker build -t "${DOCKER_HOST}/${DOCKER_TEAM}/zally-web-ui-dummy:${DOCKER_VERSION}" .
+          docker push "${DOCKER_HOST}/${DOCKER_TEAM}/zally-web-ui-dummy:${DOCKER_VERSION}"
+
+      - desc: Building and pushing Zally Github Integration
+        cmd: |
+          DOCKER_VERSION="${CDP_TARGET_BRANCH}-${CDP_TARGET_COMMIT_ID:0:8}-${CDP_TARGET_REPOSITORY_COUNTER}"
+          cd github-integration
+          docker build -t "${DOCKER_HOST}/${DOCKER_TEAM}/zally-github-integration:${DOCKER_VERSION}" .
+          docker push "${DOCKER_HOST}/${DOCKER_TEAM}/zally-github-integration:${DOCKER_VERSION}"
+
